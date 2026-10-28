@@ -9,6 +9,7 @@ import typer
 from spoofcheck import __version__, store
 from spoofcheck import snapshot as snapshots
 from spoofcheck.diff import describe_changes
+from spoofcheck.disclose import disclosure_note
 from spoofcheck.inventory import SECTORS, read_inventory
 from spoofcheck.report import (
     ALL_MEANING,
@@ -159,6 +160,26 @@ def snapshot() -> None:
     )
     path = snapshots.write_snapshot(data)
     typer.echo(f"Wrote {path.relative_to(path.parents[2])}")
+
+
+@app.command()
+def disclose(organization: str) -> None:
+    """Print a private note for one organization about its latest results."""
+    conn = store.connect()
+    scans = store.finished_scans(conn)
+    if not scans:
+        typer.echo("No finished scan yet. Run spoofcheck scan first.", err=True)
+        raise typer.Exit(EXIT_USAGE)
+    levels = store.levels_for_scan(conn, scans[0][0])
+    matches = [s for s in levels.values() if s.organization.lower() == organization.lower()]
+    if not matches:
+        typer.echo(f"No organization named {organization!r} in the last scan.", err=True)
+        raise typer.Exit(EXIT_USAGE)
+    started = conn.execute("SELECT started_at FROM scan WHERE id = ?", (scans[0][0],)).fetchone()[0]
+    for stored in matches:
+        typer.echo(
+            disclosure_note(stored.organization, stored, datetime.fromisoformat(started).date())
+        )
 
 
 @app.command("build-site")
