@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 from datetime import UTC, datetime
+from pathlib import Path
 
 import typer
 
@@ -20,6 +21,7 @@ from spoofcheck.report import (
 )
 from spoofcheck.resolver import DnsResolver
 from spoofcheck.scanner import DomainReport, check_domain, check_domains, normalize_domain
+from spoofcheck.site.build import build_site
 from spoofcheck.spf import MAX_LOOKUPS
 from spoofcheck.transport import policy_client
 
@@ -30,6 +32,7 @@ app.add_typer(inventory_app, name="inventory")
 
 log = logging.getLogger("spoofcheck")
 
+DEFAULT_SITE_DIR = Path("site")
 EXIT_HIGH_FINDING = 1
 EXIT_USAGE = 2
 EXIT_DNS_FAILURE = 3
@@ -156,6 +159,15 @@ def snapshot() -> None:
     )
     path = snapshots.write_snapshot(data)
     typer.echo(f"Wrote {path.relative_to(path.parents[2])}")
+
+
+@app.command("build-site")
+def build_site_command(
+    out: Path = typer.Option(DEFAULT_SITE_DIR, "--out", help="Folder to write the site into."),
+) -> None:
+    """Build the static site from the snapshots and the findings catalogue."""
+    written = build_site(out)
+    typer.echo(f"Wrote {len(written)} files to {out}")
 
 
 async def _check_many(domains: list[str], resolver: DnsResolver) -> list[DomainReport]:

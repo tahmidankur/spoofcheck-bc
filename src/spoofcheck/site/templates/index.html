@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros.html" import legend %}
+{% block head %}
+<script type="module" src="/assets/page.js"></script>
+{% endblock %}
+{% block main %}
+  <section class="checker" aria-labelledby="checker-title">
+    <div class="wrap">
+      <h1 id="checker-title">Can someone forge email from a B.C. public body?</h1>
+      <p class="lede">Type the part after the @ in their staff email addresses. You'll see what their DNS records tell other mail servers to do with a fake.</p>
+    </div>
+    <div class="tint-band">
+      <div class="wrap">
+        <form class="envelope check-form" id="check-form" action="/" method="get" novalidate>
+          <label for="domain">Domain</label>
+          <div class="window-row">
+            <input class="window" id="domain" name="domain" type="text" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="example.ca" required aria-describedby="domain-hint">
+            <button class="btn" type="submit">Check</button>
+          </div>
+          <p class="hint" id="domain-hint">Your browser asks a public DNS service (dns.google) for the records. Nothing is sent to the domain itself.</p>
+          <noscript><p class="hint">The checker needs JavaScript. You can also run the same checks from the command line with the <a href="{{ repo_url }}">source code</a>.</p></noscript>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" id="result" aria-live="polite" hidden></section>
+
+  <section class="week" aria-labelledby="week-title">
+    <div class="wrap">
+    {% if latest %}
+      {% set enforced = latest.levels["3"] %}
+      <h2 id="week-title" class="when">{{ week_label }}</h2>
+      <p class="headline-figure"><span class="num">{{ enforced }}</span> of <span class="num">{{ latest.total }}</span> B.C. public bodies tell other mail servers to refuse forged mail.</p>
+      <p class="coverage">Scanned {{ scanned_on.strftime("%-d %B %Y") }}. The list covers {{ latest.total }} bodies so far: the largest cities, regional districts, school districts and health authorities. More are being added.</p>
+
+      <div class="week-grid">
+        <div>
+          <h3>By sector</h3>
+          <ul class="sector-chart" aria-describedby="sector-note">
+            {% for bar in bars %}
+            <li><div class="bar-head"><span>{{ bar.label }}</span><span class="bar-total">{{ bar.total }}</span></div><div class="bar" aria-hidden="true">{% for seg in bar.segments %}<span class="seg seg-{{ seg.css }}" style="flex-basis:{{ '%.2f' % seg.share }}%" title="{{ seg.word }}: {{ seg.count }}">{% if seg.labelled %}{{ seg.count }}{% endif %}</span>{% endfor %}</div></li>
+            {% endfor %}
+          </ul>
+          <p id="sector-note" class="visually-hidden">Bar segments show how many bodies in each sector are at each level. The same numbers are in the table below.</p>
+          {{ legend() }}
+          <details class="as-table">
+            <summary>Show these numbers as a table</summary>
+            <div class="table-scroll"><table class="numbers"><thead><tr><th scope="col">Sector</th>{% for _, _, word, _ in levels %}<th scope="col">{{ word | capitalize }}</th>{% endfor %}<th scope="col">Total</th></tr></thead><tbody>
+            {% for bar in bars %}<tr><th scope="row">{{ bar.label }}</th>{% for level, _, _, _ in levels %}<td>{{ bar.counts[level] }}</td>{% endfor %}<td>{{ bar.total }}</td></tr>{% endfor %}
+            </tbody></table></div>
+          </details>
+        </div>
+        <div>
+          <h3>Share at ENFORCED, last 12 weeks</h3>
+          {% if trend_svg %}
+          <svg class="trend-chart" viewBox="0 0 320 120" role="img" aria-labelledby="trend-title"><title id="trend-title">{{ trend_title }}</title>{{ trend_svg | safe }}</svg>
+          {% else %}
+          <p class="moved">{{ trend_title }} The line starts once there are two weekly scans.</p>
+          {% endif %}
+          {% if latest.compared_with %}
+          <p class="moved">Since last week, {{ latest.moved_up }} {{ "body" if latest.moved_up == 1 else "bodies" }} tightened their policy and {{ latest.moved_down }} loosened it.</p>
+          {% else %}
+          <p class="moved">This is the first weekly scan, so there's nothing to compare it with yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <h2 id="week-title" class="when">No scan yet</h2>
+      <p class="moved">The weekly totals appear here after the first scan.</p>
+    {% endif %}
+    </div>
+  </section>
+
+  <section class="method" aria-labelledby="method-title">
+    <div class="wrap method-grid">
+      <div>
+        <h2 id="method-title">How the check works</h2>
+        <ol>
+          <li>Once a week, the scanner asks DNS for each domain's DMARC, SPF, MX, MTA-STS and TLS reporting records, plus a few common DKIM keys.</li>
+          <li>It reads the DMARC policy to set the level, and checks SPF for the mistakes that make it fail outright.</li>
+          <li>Totals by sector are published here. Results for individual bodies are sent to them privately, not posted.</li>
+        </ol>
+      </div>
+      <div>
+        <h2>What it can't tell you</h2>
+        <ul>
+          <li>Whether a body's mail filters catch forged mail sent to its own staff. That happens inside their systems.</li>
+          <li>Whether DKIM is set up, if they use a selector name we didn't try.</li>
+          <li>Anything about websites, passwords or networks. Only public email records are read.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+{% endblock %}

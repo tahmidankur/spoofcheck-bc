@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}About: SpoofCheck BC{% endblock %}
+{% block main %}
+  <div class="wrap prose">
+    <h1>About this project</h1>
+    <p class="lede">SpoofCheck BC is a student project by Tahmid Hossain Ankur, a Computing Science student at Thompson Rivers University in Kamloops.</p>
+
+    <section aria-labelledby="why-h">
+      <h2 id="why-h">Why it exists</h2>
+      <p>Scam emails that claim to come from a city hall, a school district or a health authority work because people trust those names. Whether a forged message reaches an inbox depends partly on a few public DNS records the real organization controls.</p>
+      <p>Federal departments are required to publish those records, and the federal government tracks how its own domains are doing. Nobody does the same for B.C.'s municipalities, regional districts, school districts and health authorities. This project reads their records once a week and publishes the overall picture, along with a plain guide to fixing what it finds.</p>
+    </section>
+
+    <section aria-labelledby="not-h">
+      <h2 id="not-h">What it is not</h2>
+      <p>Independent student project. Not affiliated with the Government of British Columbia or any organization listed. It is not a security audit and it doesn't rank anyone. It reads only records that every mail server on the internet already reads.</p>
+    </section>
+
+    <section aria-labelledby="contact-h">
+      <h2 id="contact-h">Corrections and contact</h2>
+      <p>If you work for one of the listed bodies and want your results, or think a domain in the list is wrong, <a href="{{ repo_url }}/issues">open an issue</a> on GitHub. Results for a named organization are only shared with that organization.</p>
+      <p>The <a href="{{ repo_url }}">source code</a>, the list of domains and the test cases are public.</p>
+    </section>
+  </div>
+{% endblock %}

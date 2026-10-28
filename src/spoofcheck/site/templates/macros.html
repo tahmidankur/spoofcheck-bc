@@ -1,0 +1,11 @@
+{% macro sev(severity) -%}
+<span class="sev sev-{{ severity }}">{{ severity | capitalize }}</span>
+{%- endmacro %}
+
+{% macro legend() -%}
+<ul class="legend">
+  {% for _, css, word, meaning in levels %}
+  <li><span class="swatch swatch-{{ css }}" aria-hidden="true"></span><span class="legend-word">{{ word }}</span><span class="legend-meaning">{{ meaning }}</span></li>
+  {% endfor %}
+</ul>
+{%- endmacro %}

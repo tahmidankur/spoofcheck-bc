@@ -7,7 +7,7 @@ __pycache__/
 *.db
 *.db-journal
 .env
-site/
+/site/
 screenshots/
 test-results/
 .vercel/

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "macros.html" import legend %}
+{% block title %}Method: SpoofCheck BC{% endblock %}
+{% block description %}What SpoofCheck BC checks, how a domain's level is set, and what the check can't tell you.{% endblock %}
+{% block main %}
+  <div class="wrap prose">
+    <h1>How the check works</h1>
+    <p class="lede">Every check reads public DNS records, the same ones any mail server reads before deciding what to do with a message. Nothing connects to a mail server and nothing is sent.</p>
+
+    <section aria-labelledby="levels-h">
+      <h2 id="levels-h">How a level is set</h2>
+      <p>Each domain gets one level, taken from its DMARC record alone. DMARC is the record that tells receivers what to do with mail that fails the checks, so it decides what happens to a forgery. Problems with SPF and DKIM show up as findings, and some of them are serious even at the top level.</p>
+      {{ legend() }}
+      <div class="table-scroll">
+        <table class="numbers rules">
+          <thead><tr><th scope="col">Level</th><th scope="col">Rule</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">ENFORCED</th><td><code>p=reject</code>, and <code>pct</code> absent or 100</td></tr>
+            <tr><th scope="row">PARTIAL</th><td><code>p=quarantine</code>, or <code>p=reject</code> with <code>pct</code> below 100</td></tr>
+            <tr><th scope="row">MONITORING</th><td><code>p=none</code></td></tr>
+            <tr><th scope="row">UNPROTECTED</th><td>No DMARC record, more than one, or one that can't be read</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="checks-h">
+      <h2 id="checks-h">What is checked</h2>
+      <dl class="terms">
+        <dt>DMARC</dt>
+        <dd>The TXT record at <code>_dmarc.</code> plus the domain. Its policy, subdomain policy, percentage and report addresses are read following RFC 7489. If reports go to another organization's domain, the scanner checks that the other domain has agreed to receive them.</dd>
+        <dt>SPF</dt>
+        <dd>The TXT record at the domain itself, following RFC 7208. Every <code>include</code>, <code>a</code>, <code>mx</code>, <code>ptr</code>, <code>exists</code> and <code>redirect</code> is counted, including those inside included records. More than 10 lookups, or more than 2 that return nothing, makes SPF fail for every message.</dd>
+        <dt>Mail servers</dt>
+        <dd>The MX records. A domain with no mail servers, or a null MX saying it takes no mail, should also say it sends none: <code>v=spf1 -all</code> and <code>p=reject</code>.</dd>
+        <dt>MTA-STS and TLS reports</dt>
+        <dd>These ask other servers to use encryption when delivering mail, and to report when they can't. They protect mail in transit, not against forgery, so they never change the level.</dd>
+        <dt>DKIM</dt>
+        <dd>DKIM keys sit under a selector name that can't be listed, so the scanner tries nine common ones. Finding a key is good news. Not finding one doesn't mean DKIM is missing.</dd>
+      </dl>
+    </section>
+
+    <section aria-labelledby="limits-h">
+      <h2 id="limits-h">Limits the scanner keeps</h2>
+      <ul>
+        <li>One scan a week, at most four DNS lookups in flight, and a five second timeout.</li>
+        <li>The only web request is one fetch of a domain's public MTA-STS policy file, and only when the domain says it has one.</li>
+        <li>Requests identify themselves as <code>SpoofCheckBC/{{ version }}</code> with a link to the source code.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="publish-h">
+      <h2 id="publish-h">What is published</h2>
+      <p>The report page shows totals by sector, never a ranked or named list. Each organization's own results go to its IT team in a private note. The weekly snapshot files in the source repository hold only totals and each domain's level under a keyed hash, so they can be compared week to week without naming anyone.</p>
+      <p>The checker on the report page is different: it looks up whatever domain you type, the same way any public DNS tool does. Your browser sends the lookups to Google's public DNS service (dns.google). The domain itself isn't contacted, and the browser can't fetch MTA-STS policy files, so the checker reads only their TXT records.</p>
+    </section>
+
+    <section aria-labelledby="cant-h">
+      <h2 id="cant-h">What it can't tell you</h2>
+      <ul>
+        <li>Whether a body's mail filters catch forged mail sent to its own staff. That happens inside their systems.</li>
+        <li>Whether DKIM is set up, if they use a selector name we didn't try.</li>
+        <li>Whether every legitimate sender passes. Only the organization's DMARC reports show that.</li>
+        <li>Anything about websites, passwords or networks. Only public email records are read.</li>
+      </ul>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{
+  "week": "2026-W44",
+  "scanned_on": "2026-10-28",
+  "tool_version": "0.1.0",
+  "total": 20,
+  "levels": {
+    "3": 4,
+    "2": 10,
+    "1": 6,
+    "0": 0
+  },
+  "sectors": {
+    "municipality": {
+      "3": 2,
+      "2": 5,
+      "1": 1,
+      "0": 0
+    },
+    "regional_district": {
+      "3": 2,
+      "2": 1,
+      "1": 0,
+      "0": 0
+    },
+    "school_district": {
+      "3": 0,
+      "2": 3,
+      "1": 0,
+      "0": 0
+    },
+    "health_authority": {
+      "3": 0,
+      "2": 1,
+      "1": 5,
+      "0": 0
+    }
+  },
+  "compared_with": null,
+  "moved_up": 0,
+  "moved_down": 0,
+  "levels_by_key": {
+    "018db7940f154be3e128a7776be888f6e9e481f1cd82d677aa3606edd8a1b67c": 2,
+    "07fee9ec59b4a32add84c05dc676d9b8ff89867d6ac39ffa9af71c36592e099f": 1,
+    "0c94880b71c6a1b1d365b0393733e1fce4140afc9cbcb66a3eaba4d454e19cf0": 2,
+    "36382bce9b651fe1da3c56b6110c34600a5b9780ba8e1cea0e7babbab34a282b": 2,
+    "4e6f1bcb659c40de5bd075d76cdd778f3bc766d3cff32478b37f01f58b478f5c": 3,
+    "552e184259ba805c4058ffbc405ce630a94a7428fb06d1a42931cff190b451b7": 1,
+    "5a239c581a643ce1e673d249fb44e17af45125f8bd65364b81f8e8c3e561004a": 2,
+    "62508e42bf43109dacbec504aa9d90002d73e80b8c713c525fc86be728899f19": 1,
+    "778eaf2b56e94d5413d8fcf63c235e3589723f279546b5e22619247ec7076395": 2,
+    "918dcb4a4d0cff07f50db94f5f979a6a5662ba84f982b49803f49fa60ebc0dba": 2,
+    "95bec9696f6c454284a5eda1a4708ea921540899972a097f6e0c5e51dafa84f9": 2,
+    "a070a330460523b8584900f2626179fa65a2e2c58fcad44d9018cfafd61c36ac": 3,
+    "a9c0a4e1d5989ac08e1bde7f6d2daa3ab3ea9ae98602b1063cca9aa02bb79341": 1,
+    "ad82daf730a39cf4df016f90eeac94cf6a569f71f41cf3f7be340f3a94e5184e": 2,
+    "b21feffd53a69253a265a13f95283a130b529a432ef7d884d6ad5a35e929dd58": 2,
+    "bc2da47311b99c5dd13ca8ff9dc436f8a3696d4833eb71cea1a0719f0116533c": 1,
+    "be53d5ab37df69cd86e6b8be680b525e19f0538a9630544d188c638474728623": 2,
+    "ddc7ce8efd67aae619aa61d1f714b68bbb0c208103271013836ef4a02767b6d2": 1,
+    "ef05e21e900f5b8ea9cd2abf3ba5cba9165212d9276efcd2a692bb7ae25dd4a3": 3,
+    "f66003212d46ff6f0d6b88ba2a35b9e2d912b6ca83d8235c67dd2c418c483564": 3
+  }
+}

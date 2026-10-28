@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "macros.html" import sev %}
+{% block title %}Fix guide: SpoofCheck BC{% endblock %}
+{% block description %}What each SpoofCheck BC finding means and the DNS change that fixes it.{% endblock %}
+{% block main %}
+  <div class="wrap prose">
+    <h1>Fix guide</h1>
+    <p class="lede">One section per finding. Each says what it means for forged mail, what to change, and the standard it comes from. Example records use <code>example.ca</code>; put your own domain in its place.</p>
+
+    <nav class="toc" aria-label="Findings on this page">
+      {% for heading, entries in groups %}
+      <div>
+        <h2 class="toc-h">{{ heading }}</h2>
+        <ul>{% for entry in entries %}<li><a href="#{{ entry.code }}">{{ entry.title }}</a></li>{% endfor %}</ul>
+      </div>
+      {% endfor %}
+    </nav>
+
+    {% for heading, entries in groups %}
+    <section class="fix-group" aria-label="{{ heading }}">
+      {% for entry in entries %}
+      <article class="fix-entry" id="{{ entry.code }}">
+        <h3>{{ entry.title }} {{ sev(entry.severity) }}</h3>
+        <p class="code"><code>{{ entry.code }}</code></p>
+        <p>{{ entry.explain }}</p>
+        {% if entry.fix %}<p><strong>What to change.</strong> {{ entry.fix }}</p>{% endif %}
+        {% if entry.example %}<pre class="record">{{ entry.example }}</pre>{% endif %}
+        {% if entry.reference %}<p class="ref">Reference: {{ entry.reference }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+{% endblock %}
