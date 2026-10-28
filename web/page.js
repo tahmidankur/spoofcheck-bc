@@ -189,14 +189,14 @@ function lookupMeter(used) {
 }
 
 function fixListHtml(findings, byCode, domain) {
-  const todo = findings
+  const toFix = findings
     .filter((f) => byCode[f.code] && byCode[f.code].severity !== "good")
     .sort((a, b) => SEVERITY_ORDER.indexOf(byCode[a.code].severity) - SEVERITY_ORDER.indexOf(byCode[b.code].severity));
-  if (!todo.length) {
+  if (!toFix.length) {
     return `<section class="fix-first" aria-labelledby="fix-h"><h3 id="fix-h">What to fix, in order</h3><p>Nothing. These records are set up the way the standards recommend.</p></section>`;
   }
   const forDomain = (text) => text.replaceAll("<domain>", domain).replaceAll("example.ca", domain);
-  const items = todo.map((f) => {
+  const items = toFix.map((f) => {
     const entry = byCode[f.code];
     const detail = f.detail ? ` (${f.detail})` : "";
     return `<li><div class="f-body">
