@@ -1,0 +1,21 @@
+org_name,sector,region,domain,source_url,verified,notes
+City of Kamloops,municipality,Thompson-Nicola,kamloops.ca,,no,seed: confirm against official site
+Thompson-Nicola Regional District,regional_district,Thompson-Nicola,tnrd.ca,,no,seed: confirm against official site
+School District 73 (Kamloops-Thompson),school_district,Thompson-Nicola,sd73.bc.ca,,no,seed: confirm against official site
+Interior Health,health_authority,Interior,interiorhealth.ca,,no,seed: confirm against official site
+City of Kelowna,municipality,Central Okanagan,kelowna.ca,,no,seed: confirm against official site
+Regional District of Central Okanagan,regional_district,Central Okanagan,rdco.com,,no,seed: confirm against official site
+City of Vernon,municipality,North Okanagan,vernon.ca,,no,seed: confirm against official site
+City of Prince George,municipality,Fraser-Fort George,princegeorge.ca,,no,seed: confirm against official site
+City of Vancouver,municipality,Metro Vancouver,vancouver.ca,,no,seed: confirm against official site
+City of Surrey,municipality,Metro Vancouver,surrey.ca,,no,seed: confirm against official site
+City of Burnaby,municipality,Metro Vancouver,burnaby.ca,,no,seed: confirm against official site
+Metro Vancouver Regional District,regional_district,Metro Vancouver,metrovancouver.org,,no,seed: confirm against official site
+City of Victoria,municipality,Capital,victoria.ca,,no,seed: confirm against official site
+Vancouver School Board (SD 39),school_district,Metro Vancouver,vsb.bc.ca,,no,seed: confirm against official site
+Surrey Schools (SD 36),school_district,Metro Vancouver,surreyschools.ca,,no,seed: confirm against official site
+Fraser Health,health_authority,Fraser,fraserhealth.ca,,no,seed: confirm against official site
+Vancouver Coastal Health,health_authority,Vancouver Coastal,vch.ca,,no,seed: confirm against official site
+Island Health,health_authority,Vancouver Island,islandhealth.ca,,no,seed: confirm against official site
+Northern Health,health_authority,Northern,northernhealth.ca,,no,seed: confirm against official site
+Provincial Health Services Authority,health_authority,Province-wide,phsa.ca,,no,seed: confirm against official site

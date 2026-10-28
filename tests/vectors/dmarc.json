@@ -1,0 +1,223 @@
+{
+  "description": "Each case lists the full TXT records found at _dmarc.<domain> (multi-string TXT already joined). 'findings' is compared as a set. Keys missing from 'expect' are not checked.",
+  "cases": [
+    {
+      "name": "reject applies to all mail",
+      "txt": [
+        "v=DMARC1; p=reject; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 3,
+        "policy": "reject",
+        "pct": 100,
+        "findings": [
+          "DMARC_ENFORCED"
+        ]
+      }
+    },
+    {
+      "name": "monitoring only",
+      "txt": [
+        "v=DMARC1; p=none; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 1,
+        "policy": "none",
+        "findings": [
+          "DMARC_POLICY_NONE"
+        ]
+      }
+    },
+    {
+      "name": "quarantine",
+      "txt": [
+        "v=DMARC1; p=quarantine; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 2,
+        "policy": "quarantine",
+        "findings": [
+          "DMARC_POLICY_QUARANTINE"
+        ]
+      }
+    },
+    {
+      "name": "reject on half the mail",
+      "txt": [
+        "v=DMARC1; p=reject; pct=50; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 2,
+        "policy": "reject",
+        "pct": 50,
+        "findings": [
+          "DMARC_PCT_PARTIAL"
+        ]
+      }
+    },
+    {
+      "name": "quarantine on half the mail",
+      "txt": [
+        "v=DMARC1; p=quarantine; pct=50; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 2,
+        "policy": "quarantine",
+        "pct": 50,
+        "findings": [
+          "DMARC_POLICY_QUARANTINE",
+          "DMARC_PCT_PARTIAL"
+        ]
+      }
+    },
+    {
+      "name": "no record at all",
+      "txt": [],
+      "expect": {
+        "level": 0,
+        "policy": null,
+        "findings": [
+          "DMARC_MISSING"
+        ]
+      }
+    },
+    {
+      "name": "only unrelated TXT",
+      "txt": [
+        "google-site-verification=abc123"
+      ],
+      "expect": {
+        "level": 0,
+        "policy": null,
+        "findings": [
+          "DMARC_MISSING"
+        ]
+      }
+    },
+    {
+      "name": "two DMARC records",
+      "txt": [
+        "v=DMARC1; p=reject; rua=mailto:dmarc@example.ca",
+        "v=DMARC1; p=none; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 0,
+        "policy": null,
+        "findings": [
+          "DMARC_MULTIPLE"
+        ]
+      }
+    },
+    {
+      "name": "version tag not first",
+      "txt": [
+        "p=reject; v=DMARC1; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 0,
+        "policy": null,
+        "findings": [
+          "DMARC_SYNTAX"
+        ]
+      }
+    },
+    {
+      "name": "p missing but rua valid is treated as none",
+      "txt": [
+        "v=DMARC1; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 1,
+        "policy": "none",
+        "findings": [
+          "DMARC_SYNTAX",
+          "DMARC_POLICY_NONE"
+        ]
+      }
+    },
+    {
+      "name": "p misspelled but rua valid is treated as none",
+      "txt": [
+        "v=DMARC1; p=rejectt; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 1,
+        "policy": "none",
+        "findings": [
+          "DMARC_SYNTAX",
+          "DMARC_POLICY_NONE"
+        ]
+      }
+    },
+    {
+      "name": "p missing and no rua",
+      "txt": [
+        "v=DMARC1; adkim=s"
+      ],
+      "expect": {
+        "level": 0,
+        "policy": null,
+        "findings": [
+          "DMARC_SYNTAX",
+          "DMARC_NO_REPORTS"
+        ]
+      }
+    },
+    {
+      "name": "subdomain policy weaker",
+      "txt": [
+        "v=DMARC1; p=reject; sp=none; rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 3,
+        "policy": "reject",
+        "subdomain_policy": "none",
+        "findings": [
+          "DMARC_ENFORCED",
+          "DMARC_SUBDOMAIN_WEAKER"
+        ]
+      }
+    },
+    {
+      "name": "reject without reports",
+      "txt": [
+        "v=DMARC1; p=reject"
+      ],
+      "expect": {
+        "level": 3,
+        "policy": "reject",
+        "findings": [
+          "DMARC_ENFORCED",
+          "DMARC_NO_REPORTS"
+        ]
+      }
+    },
+    {
+      "name": "mixed case and loose spacing",
+      "txt": [
+        "v=DMARC1;p=Reject ; pct=100;rua=mailto:dmarc@example.ca"
+      ],
+      "expect": {
+        "level": 3,
+        "policy": "reject",
+        "pct": 100,
+        "findings": [
+          "DMARC_ENFORCED"
+        ]
+      }
+    },
+    {
+      "name": "trailing semicolon",
+      "txt": [
+        "v=DMARC1; p=quarantine; rua=mailto:dmarc@example.ca;"
+      ],
+      "expect": {
+        "level": 2,
+        "policy": "quarantine",
+        "findings": [
+          "DMARC_POLICY_QUARANTINE"
+        ]
+      }
+    }
+  ]
+}

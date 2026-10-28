@@ -1,0 +1,442 @@
+{
+  "description": "'zone' maps a DNS name to its records by type. A name missing from the zone is NXDOMAIN; a type missing under a present name is an empty answer. Both count as void lookups. The domain being checked is always example.ca. Lookups are counted statically across every include and redirect, the way checkers do, not only along the path a real message would take. A term containing a macro (%{...}) counts as one lookup and is not resolved. An include loop is reported as SPF_TOO_MANY_LOOKUPS, because real evaluation would hit the limit. 'findings' is compared as a set; missing keys in 'expect' are not checked.",
+  "cases": [
+    {
+      "name": "ip ranges only, hard fail",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.0/24 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 0,
+        "void_lookups": 0,
+        "findings": []
+      }
+    },
+    {
+      "name": "one include, softfail",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:_spf.mailhost.example ~all"
+          ]
+        },
+        "_spf.mailhost.example": {
+          "TXT": [
+            "v=spf1 ip4:198.51.100.0/24 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "~",
+        "lookups": 1,
+        "findings": [
+          "SPF_SOFTFAIL_ALL"
+        ]
+      }
+    },
+    {
+      "name": "no SPF record",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "google-site-verification=abc123"
+          ]
+        }
+      },
+      "expect": {
+        "all": null,
+        "lookups": 0,
+        "findings": [
+          "SPF_MISSING"
+        ]
+      }
+    },
+    {
+      "name": "two SPF records",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 -all",
+            "v=spf1 include:_spf.mailhost.example -all"
+          ]
+        }
+      },
+      "expect": {
+        "findings": [
+          "SPF_MULTIPLE"
+        ]
+      }
+    },
+    {
+      "name": "pass all",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 +all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "+",
+        "findings": [
+          "SPF_PASS_ALL"
+        ]
+      }
+    },
+    {
+      "name": "neutral all",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 ?all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "?",
+        "findings": [
+          "SPF_NEUTRAL_ALL"
+        ]
+      }
+    },
+    {
+      "name": "no all and no redirect",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1"
+          ]
+        }
+      },
+      "expect": {
+        "all": null,
+        "findings": [
+          "SPF_NEUTRAL_ALL"
+        ]
+      }
+    },
+    {
+      "name": "redirect supplies the all",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 redirect=_spf.example.ca"
+          ]
+        },
+        "_spf.example.ca": {
+          "TXT": [
+            "v=spf1 ip4:203.0.113.5 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 1,
+        "findings": []
+      }
+    },
+    {
+      "name": "nested includes over the limit",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:a.example include:b.example -all"
+          ]
+        },
+        "a.example": {
+          "TXT": [
+            "v=spf1 include:a1.example include:a2.example include:a3.example include:a4.example include:a5.example -all"
+          ]
+        },
+        "b.example": {
+          "TXT": [
+            "v=spf1 include:b1.example include:b2.example include:b3.example include:b4.example include:b5.example -all"
+          ]
+        },
+        "a1.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 -all"
+          ]
+        },
+        "a2.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.2 -all"
+          ]
+        },
+        "a3.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.3 -all"
+          ]
+        },
+        "a4.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.4 -all"
+          ]
+        },
+        "a5.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.5 -all"
+          ]
+        },
+        "b1.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 -all"
+          ]
+        },
+        "b2.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.2 -all"
+          ]
+        },
+        "b3.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.3 -all"
+          ]
+        },
+        "b4.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.4 -all"
+          ]
+        },
+        "b5.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.5 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 12,
+        "findings": [
+          "SPF_TOO_MANY_LOOKUPS"
+        ]
+      }
+    },
+    {
+      "name": "exactly ten lookups is allowed",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:s1.example include:s2.example include:s3.example include:s4.example include:s5.example include:s6.example include:s7.example include:s8.example include:s9.example include:s10.example -all"
+          ]
+        },
+        "s1.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 -all"
+          ]
+        },
+        "s2.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.2 -all"
+          ]
+        },
+        "s3.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.3 -all"
+          ]
+        },
+        "s4.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.4 -all"
+          ]
+        },
+        "s5.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.5 -all"
+          ]
+        },
+        "s6.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.6 -all"
+          ]
+        },
+        "s7.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.7 -all"
+          ]
+        },
+        "s8.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.8 -all"
+          ]
+        },
+        "s9.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.9 -all"
+          ]
+        },
+        "s10.example": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.10 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 10,
+        "findings": []
+      }
+    },
+    {
+      "name": "include target has no SPF",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:missing.example -all"
+          ]
+        }
+      },
+      "expect": {
+        "lookups": 1,
+        "void_lookups": 1,
+        "findings": [
+          "SPF_INCLUDE_BROKEN"
+        ]
+      }
+    },
+    {
+      "name": "three void lookups",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 a:gone1.example a:gone2.example a:gone3.example ip4:192.0.2.1 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 3,
+        "void_lookups": 3,
+        "findings": [
+          "SPF_VOID_LOOKUPS"
+        ]
+      }
+    },
+    {
+      "name": "two void lookups is allowed",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 a:gone1.example a:gone2.example ip4:192.0.2.1 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 2,
+        "void_lookups": 2,
+        "findings": []
+      }
+    },
+    {
+      "name": "ptr mechanism",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ptr -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 1,
+        "findings": [
+          "SPF_PTR"
+        ]
+      }
+    },
+    {
+      "name": "mx mechanism counts one lookup",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 mx -all"
+          ],
+          "MX": [
+            "10 mail.example.ca."
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 1,
+        "void_lookups": 0,
+        "findings": []
+      }
+    },
+    {
+      "name": "version tag in capitals",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=SPF1 -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 0,
+        "findings": []
+      }
+    },
+    {
+      "name": "macro is counted but not resolved",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 exists:%{i}._spf.example.ca -all"
+          ]
+        }
+      },
+      "expect": {
+        "all": "-",
+        "lookups": 1,
+        "void_lookups": 0,
+        "findings": []
+      }
+    },
+    {
+      "name": "include loop",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:loop.example -all"
+          ]
+        },
+        "loop.example": {
+          "TXT": [
+            "v=spf1 include:example.ca -all"
+          ]
+        }
+      },
+      "expect": {
+        "findings": [
+          "SPF_TOO_MANY_LOOKUPS"
+        ]
+      }
+    }
+  ]
+}

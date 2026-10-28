@@ -1,0 +1,118 @@
+{
+  "description": "Whole-domain cases covering the dmarc, spf and mx checks together. Only findings from those three checks plus DNS errors are compared; transport and DKIM need the network and are tested with fakes instead. NON_MAIL_DOMAIN_OPEN applies when the domain has no MX or a null MX and either its SPF record is not exactly 'v=spf1 -all' or its level is below 3. A domain that does not exist reports only DNS_NXDOMAIN.",
+  "cases": [
+    {
+      "name": "parked domain locked down",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 -all"
+          ],
+          "MX": [
+            "0 ."
+          ]
+        },
+        "_dmarc.example.ca": {
+          "TXT": [
+            "v=DMARC1; p=reject;"
+          ]
+        }
+      },
+      "expect": {
+        "level": 3,
+        "findings": [
+          "MX_NULL",
+          "DMARC_ENFORCED",
+          "DMARC_NO_REPORTS"
+        ]
+      }
+    },
+    {
+      "name": "parked domain left open",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "MX": [
+            "0 ."
+          ]
+        }
+      },
+      "expect": {
+        "level": 0,
+        "findings": [
+          "MX_NULL",
+          "NON_MAIL_DOMAIN_OPEN",
+          "DMARC_MISSING",
+          "SPF_MISSING"
+        ]
+      }
+    },
+    {
+      "name": "no mail servers, soft records",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 ip4:192.0.2.1 ~all"
+          ]
+        },
+        "_dmarc.example.ca": {
+          "TXT": [
+            "v=DMARC1; p=none; rua=mailto:dmarc@example.ca"
+          ]
+        }
+      },
+      "expect": {
+        "level": 1,
+        "findings": [
+          "MX_NONE",
+          "NON_MAIL_DOMAIN_OPEN",
+          "DMARC_POLICY_NONE",
+          "SPF_SOFTFAIL_ALL"
+        ]
+      }
+    },
+    {
+      "name": "normal mail domain, enforced",
+      "domain": "example.ca",
+      "zone": {
+        "example.ca": {
+          "TXT": [
+            "v=spf1 include:_spf.mailhost.example -all"
+          ],
+          "MX": [
+            "10 mx1.mailhost.example."
+          ]
+        },
+        "_spf.mailhost.example": {
+          "TXT": [
+            "v=spf1 ip4:198.51.100.0/24 -all"
+          ]
+        },
+        "_dmarc.example.ca": {
+          "TXT": [
+            "v=DMARC1; p=reject; rua=mailto:dmarc@example.ca"
+          ]
+        }
+      },
+      "expect": {
+        "level": 3,
+        "findings": [
+          "DMARC_ENFORCED"
+        ]
+      }
+    },
+    {
+      "name": "domain does not exist",
+      "domain": "example.ca",
+      "zone": {},
+      "expect": {
+        "level": 0,
+        "findings": [
+          "DNS_NXDOMAIN"
+        ]
+      }
+    }
+  ]
+}
