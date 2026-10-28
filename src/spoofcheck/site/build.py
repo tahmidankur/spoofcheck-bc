@@ -99,7 +99,9 @@ def build_site(out: Path) -> list[Path]:
 def copy_assets(folder: Path) -> list[Path]:
     folder.mkdir(parents=True, exist_ok=True)
     copied = [Path(shutil.copy(ASSETS / "site.css", folder))]
-    copied += [Path(shutil.copy(js, folder)) for js in sorted(WEB.glob("*.js")) if ".test." not in js.name]
+    copied += [
+        Path(shutil.copy(js, folder)) for js in sorted(WEB.glob("*.js")) if ".test." not in js.name
+    ]
     copied.append(Path(shutil.copy(CATALOGUE_PATH, folder / "findings.json")))
     orgs = folder / "orgs.json"
     orgs.write_text(json.dumps(org_names(), indent=1, sort_keys=True), encoding="utf-8")
@@ -155,7 +157,8 @@ def trend_title(snapshots: list[dict[str, Any]]) -> str:
         return f"{b}% of bodies were at ENFORCED in week {_week_number(last)}."
     verb = "rose" if b > a else "fell" if b < a else "stayed"
     if verb == "stayed":
-        return f"Share of bodies at ENFORCED stayed at {b}% from week {_week_number(first)} to {_week_number(last)}."
+        weeks = f"week {_week_number(first)} to {_week_number(last)}"
+        return f"Share of bodies at ENFORCED stayed at {b}% from {weeks}."
     return (
         f"Share of bodies at ENFORCED {verb} from {a}% in week {_week_number(first)} "
         f"to {b}% in week {_week_number(last)}."
@@ -180,13 +183,17 @@ def trend_svg(snapshots: list[dict[str, Any]]) -> str | None:
     parts = []
     for share in (low, (low + high) / 2, high):
         gy = y(share)
-        parts.append(f'<line class="t-grid" x1="{left:g}" x2="{right:g}" y1="{gy:.1f}" y2="{gy:.1f}"/>')
+        parts.append(
+            f'<line class="t-grid" x1="{left:g}" x2="{right:g}" y1="{gy:.1f}" y2="{gy:.1f}"/>'
+        )
         parts.append(
             f'<text class="t-axis" x="28" y="{gy:.1f}" text-anchor="end" '
             f'dominant-baseline="central">{share:g}%</text>'
         )
     parts.append(
-        '<polyline class="t-line" points="' + " ".join(f"{x:.1f},{py:.1f}" for x, py in points) + '"/>'
+        '<polyline class="t-line" points="'
+        + " ".join(f"{x:.1f},{py:.1f}" for x, py in points)
+        + '"/>'
     )
     parts.append(f'<circle class="t-end" cx="{end_x:.1f}" cy="{end_y:.1f}" r="3.5"/>')
     parts.append(
