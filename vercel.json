@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pip3 install --user uv",
-  "buildCommand": "python3 -m uv run --no-dev --python 3.12 spoofcheck build-site --out site",
+  "installCommand": "uv sync --no-dev",
+  "buildCommand": "uv run --no-dev spoofcheck build-site --out site",
   "outputDirectory": "site",
   "trailingSlash": true,
   "headers": [

@@ -7,6 +7,7 @@ __pycache__/
 *.db
 *.db-journal
 .env
+.env.local
 /site/
 screenshots/
 test-results/
