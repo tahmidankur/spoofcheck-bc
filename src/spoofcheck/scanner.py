@@ -44,6 +44,13 @@ def normalize_domain(text: str) -> str:
     return domain
 
 
+async def check_domains(
+    domains: list[str], resolver: Resolver, client: httpx.AsyncClient
+) -> list[DomainReport]:
+    # The resolver caps queries in flight, so starting every domain at once is safe.
+    return list(await asyncio.gather(*(check_domain(d, resolver, client) for d in domains)))
+
+
 async def check_domain(domain: str, resolver: Resolver, client: httpx.AsyncClient) -> DomainReport:
     apex = await resolver.txt(domain)
     if apex.outcome is Outcome.NXDOMAIN:
