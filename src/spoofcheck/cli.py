@@ -5,6 +5,7 @@ from datetime import datetime
 import typer
 
 from spoofcheck import __version__
+from spoofcheck.inventory import read_inventory
 from spoofcheck.report import (
     ALL_MEANING,
     LEVEL_WORDS,
@@ -20,6 +21,9 @@ from spoofcheck.spf import MAX_LOOKUPS
 from spoofcheck.transport import policy_client
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, help="Email spoofing checks.")
+
+inventory_app = typer.Typer(no_args_is_help=True, help="Work with data/inventory.csv.")
+app.add_typer(inventory_app, name="inventory")
 
 EXIT_HIGH_FINDING = 1
 EXIT_USAGE = 2
@@ -55,6 +59,20 @@ def check(
         raise typer.Exit(EXIT_DNS_FAILURE)
     if report.worst_severity == "high":
         raise typer.Exit(EXIT_HIGH_FINDING)
+
+
+@inventory_app.command("check")
+def inventory_check() -> None:
+    """Validate the inventory and list rows nobody has verified yet."""
+    bodies, problems = read_inventory()
+    for problem in problems:
+        typer.echo(problem)
+    unverified = [b for b in bodies if not b.verified]
+    typer.echo(f"{len(bodies)} rows ok, {len(problems)} problems, {len(unverified)} not verified")
+    for body in unverified:
+        typer.echo(f"  {body.domain:<24} {body.name}")
+    if problems:
+        raise typer.Exit(EXIT_USAGE)
 
 
 async def _check_one(domain: str) -> DomainReport:
