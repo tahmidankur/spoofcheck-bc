@@ -3,6 +3,7 @@ name = "spoofcheck"
 version = "0.1.0"
 description = "Reads public DNS records of B.C. public bodies and reports how well each domain is protected against email spoofing."
 requires-python = ">=3.12"
+readme = "README.md"
 license = "MIT"
 authors = [{ name = "Tahmid Hossain Ankur" }]
 dependencies = [
