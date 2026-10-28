@@ -26,7 +26,7 @@ Read before doing anything:
 ```
 uv sync                         # install
 uv run pytest                   # Python tests, including vectors
-node --test web/                # browser checker tests against the same vectors
+node --test web/*.test.js       # browser checker tests against the same vectors
 uv run ruff check . && uv run ruff format --check .
 uv run mypy src
 uv run spoofcheck check example.ca
