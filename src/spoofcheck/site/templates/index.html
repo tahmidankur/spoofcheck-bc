@@ -26,6 +26,28 @@
 
   <section class="result" id="result" aria-live="polite" hidden></section>
 
+  <template id="postmark">
+    <svg class="postmark" viewBox="0 0 214 112" role="img">
+      <defs>
+        <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.6"/>
+        </filter>
+        <path id="arc-top" d="M 14 56 A 42 42 0 0 1 98 56"/>
+        <path id="arc-bottom" d="M 10 56 A 46 46 0 0 0 102 56"/>
+      </defs>
+      <g filter="url(#ink)">
+        <circle cx="56" cy="56" r="52" class="pm-ring"/>
+        <line x1="6.5" y1="44" x2="105.5" y2="44" class="pm-ring pm-ring-thin"/>
+        <line x1="6.5" y1="68" x2="105.5" y2="68" class="pm-ring pm-ring-thin"/>
+        <text class="pm-arc"><textPath href="#arc-top" startOffset="50%" text-anchor="middle">SPOOFCHECK BC</textPath></text>
+        <text class="pm-arc"><textPath href="#arc-bottom" startOffset="50%" text-anchor="middle" class="pm-date"></textPath></text>
+        <text class="pm-word" x="56" y="56.5" text-anchor="middle" dominant-baseline="central"></text>
+        <g class="pm-waves"><path d="M118 34 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0"/><path d="M118 45 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0"/><path d="M118 56 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0"/><path d="M118 67 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0"/><path d="M118 78 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0 q 6.5 5 13 0 q 6.5 -5 13 0"/></g>
+      </g>
+    </svg>
+  </template>
+
   <section class="week" aria-labelledby="week-title">
     <div class="wrap">
     {% if latest %}
