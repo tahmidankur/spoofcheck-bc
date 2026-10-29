@@ -53,8 +53,20 @@
         </div>
         <div>
           <h3>Share at ENFORCED, last 12 weeks</h3>
-          {% if trend_svg %}
-          <svg class="trend-chart" viewBox="0 0 320 120" role="img" aria-labelledby="trend-title"><title id="trend-title">{{ trend_title }}</title>{{ trend_svg | safe }}</svg>
+          {% if trend %}
+          {% set end_x, end_y = trend.points[-1] %}
+          <svg class="trend-chart" viewBox="0 0 320 120" role="img" aria-labelledby="trend-title">
+            <title id="trend-title">{{ trend_title }}</title>
+            {% for y, label in trend.gridlines %}
+            <line class="t-grid" x1="34" x2="280" y1="{{ '%.1f' % y }}" y2="{{ '%.1f' % y }}"/>
+            <text class="t-axis" x="28" y="{{ '%.1f' % y }}" text-anchor="end" dominant-baseline="central">{{ label }}</text>
+            {% endfor %}
+            <polyline class="t-line" points="{{ trend.polyline }}"/>
+            <circle class="t-end" cx="{{ '%.1f' % end_x }}" cy="{{ '%.1f' % end_y }}" r="3.5"/>
+            <text class="t-endlabel" x="{{ '%.1f' % (end_x + 8) }}" y="{{ '%.1f' % end_y }}" dominant-baseline="central">{{ trend.end_label }}</text>
+            <text class="t-axis" x="34" y="116" text-anchor="start">{{ trend.first_week }}</text>
+            <text class="t-axis" x="280" y="116" text-anchor="end">{{ trend.last_week }}</text>
+          </svg>
           {% else %}
           <p class="moved">{{ trend_title }} The line starts once there are two weekly scans.</p>
           {% endif %}

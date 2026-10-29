@@ -125,7 +125,7 @@ def week_context(snapshots: list[dict[str, Any]]) -> dict[str, Any]:
         "week_label": f"Week {int(week)}, {year}",
         "scanned_on": date.fromisoformat(latest["scanned_on"]),
         "bars": sector_bars(latest),
-        "trend_svg": trend_svg(snapshots[-TREND_WEEKS:]),
+        "trend": trend_chart(snapshots[-TREND_WEEKS:]),
         "trend_title": trend_title(snapshots[-TREND_WEEKS:]),
     }
 
@@ -165,11 +165,26 @@ def trend_title(snapshots: list[dict[str, Any]]) -> str:
     )
 
 
-def trend_svg(snapshots: list[dict[str, Any]]) -> str | None:
-    """The ENFORCED share as a small line chart, drawn the way the design reference does it."""
+@dataclass(frozen=True)
+class TrendChart:
+    """Positions for the trend SVG in index.html, in its 320 x 120 viewBox."""
+
+    gridlines: list[tuple[float, str]]
+    points: list[tuple[float, float]]
+    end_label: str
+    first_week: str
+    last_week: str
+
+    @property
+    def polyline(self) -> str:
+        return " ".join(f"{x:.1f},{y:.1f}" for x, y in self.points)
+
+
+def trend_chart(snapshots: list[dict[str, Any]]) -> TrendChart | None:
     if len(snapshots) < 2:
         return None
     shares = [enforced_share(s) for s in snapshots]
+    # Gridlines on round 5% steps that cover the data, at least 10 points apart
     low = 5 * math.floor(min(shares) / 5)
     high = max(5 * math.ceil(max(shares) / 5), low + 10)
     left, right, top, bottom = 34.0, 280.0, 10.0, 98.0
@@ -178,37 +193,13 @@ def trend_svg(snapshots: list[dict[str, Any]]) -> str | None:
         return bottom - (share - low) / (high - low) * (bottom - top)
 
     step = (right - left) / (len(shares) - 1)
-    points = [(left + i * step, y(s)) for i, s in enumerate(shares)]
-    end_x, end_y = points[-1]
-    parts = []
-    for share in (low, (low + high) / 2, high):
-        gy = y(share)
-        parts.append(
-            f'<line class="t-grid" x1="{left:g}" x2="{right:g}" y1="{gy:.1f}" y2="{gy:.1f}"/>'
-        )
-        parts.append(
-            f'<text class="t-axis" x="28" y="{gy:.1f}" text-anchor="end" '
-            f'dominant-baseline="central">{share:g}%</text>'
-        )
-    parts.append(
-        '<polyline class="t-line" points="'
-        + " ".join(f"{x:.1f},{py:.1f}" for x, py in points)
-        + '"/>'
+    return TrendChart(
+        gridlines=[(y(share), f"{share:g}%") for share in (low, (low + high) / 2, high)],
+        points=[(left + i * step, y(share)) for i, share in enumerate(shares)],
+        end_label=f"{round(shares[-1])}%",
+        first_week=f"W{_week_number(snapshots[0])}",
+        last_week=f"W{_week_number(snapshots[-1])}",
     )
-    parts.append(f'<circle class="t-end" cx="{end_x:.1f}" cy="{end_y:.1f}" r="3.5"/>')
-    parts.append(
-        f'<text class="t-endlabel" x="{end_x + 8:.1f}" y="{end_y:.1f}" '
-        f'dominant-baseline="central">{round(shares[-1])}%</text>'
-    )
-    parts.append(
-        f'<text class="t-axis" x="{left:g}" y="116" text-anchor="start">'
-        f"W{_week_number(snapshots[0])}</text>"
-    )
-    parts.append(
-        f'<text class="t-axis" x="{end_x:.1f}" y="116" text-anchor="end">'
-        f"W{_week_number(snapshots[-1])}</text>"
-    )
-    return "".join(parts)
 
 
 def fix_groups() -> list[tuple[str, list[Any]]]:

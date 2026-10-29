@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from spoofcheck.site.build import build_site, sector_bars, trend_svg
+from spoofcheck.site.build import build_site, sector_bars, trend_chart
 
 
 def snapshot(week: int, enforced: int, total: int = 20) -> dict[str, object]:
@@ -19,13 +19,14 @@ def test_small_segments_carry_no_count_label() -> None:
 
 
 def test_trend_needs_two_weeks() -> None:
-    assert trend_svg([snapshot(44, 4)]) is None
+    assert trend_chart([snapshot(44, 4)]) is None
 
 
 def test_trend_labels_first_and_last_week_and_end_value() -> None:
-    svg = trend_svg([snapshot(43, 4), snapshot(44, 5)])
-    assert svg is not None
-    assert "W43" in svg and "W44" in svg and ">25%</text>" in svg
+    chart = trend_chart([snapshot(43, 4), snapshot(44, 5)])
+    assert chart is not None
+    assert (chart.first_week, chart.last_week, chart.end_label) == ("W43", "W44", "25%")
+    assert [label for _, label in chart.gridlines] == ["20%", "25%", "30%"]
 
 
 def test_build_writes_every_page_and_the_checker_assets(tmp_path: Path) -> None:
