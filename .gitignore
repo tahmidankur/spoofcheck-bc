@@ -13,3 +13,6 @@ screenshots/
 test-results/
 .vercel/
 node_modules/
+
+# local working notes, not part of the project
+notes/

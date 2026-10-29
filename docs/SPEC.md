@@ -1,7 +1,7 @@
 # SpoofCheck BC: product spec
 
 Owner: Tahmid Hossain Ankur
-Status: ready to build, milestone 0
+Status: v1 live, scanning weekly
 Last edited: 2026-10-28
 
 ## 1. The problem
@@ -20,7 +20,6 @@ SpoofCheck BC reads their public DNS records every week, works out how well each
 |---|---|
 | A resident or journalist | "Is the overall picture getting better?" and "Can I check one domain myself?" |
 | IT staff at a public body | "What exactly is wrong with our records and what do I change?" |
-| A co-op recruiter reading my GitHub | Clean code, real tests, clear thinking about ethics and limits |
 
 ## 3. Scope
 
@@ -31,7 +30,7 @@ SpoofCheck BC reads their public DNS records every week, works out how well each
 - A command-line tool for checking one domain or scanning the whole inventory.
 - SQLite history so week-over-week changes can be reported.
 - A static website: this week's summary, sector breakdown, trend, an in-browser checker, methodology, and a fix guide.
-- A weekly GitHub Actions run that scans, rebuilds the site and deploys it to GitHub Pages.
+- A weekly GitHub Actions run that scans and commits a new snapshot; Vercel rebuilds the site on each push.
 - A `disclose` command that writes a polite, private note for one organization explaining its findings.
 
 ### Out of scope (v1)
@@ -178,7 +177,7 @@ Migrations: plain numbered `.sql` files in `src/spoofcheck/migrations/`, applied
 
 - Only public DNS records and the public MTA-STS policy file are read. Nothing touches a mail server, and nothing is sent.
 - Scans run at most once a week, with at most 4 lookups in flight and a 5 second timeout.
-- The public site shows aggregates by sector. It does not publish a ranked or named list. Full per-domain history lives only in Ankur's local SQLite file; CI needs only the keyed levels in the last snapshot.
+- The public site shows aggregates by sector. It does not publish a ranked or named list. Full per-domain history lives only in my local SQLite file; CI needs only the keyed levels in the last snapshot.
 - `PUBLISH_NAMED` stays `false`. If that ever changes, it happens only after every organization in the list has been sent its disclosure note and given 60 days.
 - The in-browser checker lets anyone check any one domain, the same way public lookup tools do. Queries go from the visitor's browser to a public DNS-over-HTTPS resolver, and the site says so.
 - Every page carries: "Independent student project. Not affiliated with the Government of British Columbia or any organization listed." The site must not use B.C. government logos, the BC Sans typeface, or colours that imitate gov.bc.ca.
@@ -216,7 +215,7 @@ Exit codes: `0` ok, `1` the checked domain has a `high` finding (useful in CI fo
  │                                                          │
  │ store.py (sqlite3) ◄── results          findings.py ◄── data/findings.json
  │ snapshot.py ─► data/snapshots/*.json                     │
- │ site/build.py (Jinja2) ─► site/  ─► GitHub Pages         │
+ │ site/build.py (Jinja2) ─► site/  ─► Vercel               │
  └──────────────────────────────────────────────────────────┘
 
  web/check.js (copied to site/assets/ on build)  ─► DNS-over-HTTPS JSON API
@@ -243,9 +242,9 @@ Two implementations of the parsing rules exist on purpose: Python for scans, Jav
 
 The look is defined in `docs/DESIGN.md` and drawn in `docs/design-reference/index.html`.
 
-## 12. Milestones
+## 12. Build order
 
-Each milestone ends with tests passing, one or more small commits, and Ankur able to explain the code without notes.
+The order I built it in. Each step ended with the tests passing.
 
 | # | Milestone | Done when | Rough time |
 |---|---|---|---|
@@ -256,7 +255,7 @@ Each milestone ends with tests passing, one or more small commits, and Ankur abl
 | M4 | Inventory, scan, history | `scan`, `diff`, `snapshot`, `inventory check` work on the seed list | 1 evening |
 | M5 | Static site | `build-site` output matches the design reference at 390 px and 1280 px | 1 weekend |
 | M6 | Browser checker | `check.js` passes every vector with `node --test`; live check works on the built site | 1 weekend |
-| M7 | Automation and disclosure | Weekly workflow scans, commits a snapshot, deploys Pages; `disclose` writes a note | 1 evening |
-| M8 | Finish | README written by Ankur, screenshots, short demo recording | 1 evening |
+| M7 | Automation and disclosure | Weekly workflow scans, commits a snapshot, Vercel redeploys; `disclose` writes a note | 1 evening |
+| M8 | Finish | README, screenshots, short demo recording | 1 evening |
 
-The first usable version is M0 to M4: a working command-line tool with history. That alone is enough to put on a resume and talk about. M5 to M8 make it visible.
+M0 to M4 give a working command-line tool with history. M5 to M8 add the website, the browser checker and the weekly run.

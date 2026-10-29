@@ -114,7 +114,7 @@ Rules:
 - No emoji anywhere on the site.
 - Each page footer carries the independence disclaimer. The site must not look like gov.bc.ca: no B.C. government logo, crest or BC Sans font.
 
-## What makes it look generated (don't do these)
+## Things to avoid
 
 - Purple or blue-to-purple gradients, glassmorphism, blurred colour blobs.
 - A grid of identical rounded cards with the same soft shadow.
