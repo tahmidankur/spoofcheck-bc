@@ -74,13 +74,10 @@ class DnsResolver:
             # incomplete as a timeout does, so both become "try next week".
             except (dns.exception.Timeout, dns.resolver.NoNameservers):
                 return Answer(Outcome.TIMEOUT)
-        return Answer(Outcome.OK, tuple(_rdata_text(r) for r in response))
-
-
-def _rdata_text(rdata: object) -> str:
-    strings = getattr(rdata, "strings", None)
-    if strings is not None:
-        # A TXT record longer than 255 bytes arrives as several strings that
-        # mean one value (RFC 7208 §3.3), so join them without spaces.
-        return b"".join(strings).decode("utf-8", errors="replace")
-    return str(rdata)
+        if rdtype == dns.rdatatype.TXT:
+            # A TXT record longer than 255 bytes arrives as several strings that
+            # mean one value (RFC 7208 §3.3), so join them without spaces.
+            texts = [b"".join(r.strings).decode("utf-8", errors="replace") for r in response]
+        else:
+            texts = [r.to_text() for r in response]
+        return Answer(Outcome.OK, tuple(texts))

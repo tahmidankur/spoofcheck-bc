@@ -1,7 +1,7 @@
 import json
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from importlib import resources
 from pathlib import Path
 
@@ -18,6 +18,13 @@ class StoredLevel:
     sector: str
     level: int
     codes: frozenset[str]
+
+
+@dataclass(frozen=True)
+class ScanInfo:
+    id: int
+    week: str
+    started_on: date
 
 
 def connect(path: Path | str = DB_PATH) -> sqlite3.Connection:
@@ -112,11 +119,15 @@ def _upsert_body(conn: sqlite3.Connection, body: Body) -> int:
     return int(row[0])
 
 
-def finished_scans(conn: sqlite3.Connection) -> list[tuple[int, str]]:
+def finished_scans(conn: sqlite3.Connection) -> list[ScanInfo]:
+    """Every completed scan, newest first."""
     rows = conn.execute(
-        "SELECT id, iso_week FROM scan WHERE finished_at IS NOT NULL ORDER BY id DESC"
+        "SELECT id, iso_week, started_at FROM scan WHERE finished_at IS NOT NULL ORDER BY id DESC"
     ).fetchall()
-    return [(int(r[0]), str(r[1])) for r in rows]
+    return [
+        ScanInfo(scan_id, week, datetime.fromisoformat(started).date())
+        for scan_id, week, started in rows
+    ]
 
 
 def levels_for_scan(conn: sqlite3.Connection, scan_id: int) -> dict[str, StoredLevel]:

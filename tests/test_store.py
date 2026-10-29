@@ -54,7 +54,12 @@ async def test_scan_of_three_fake_domains_is_stored_with_findings() -> None:
         save_result(conn, scan_id, body, report)
     finish_scan(conn, scan_id, started)
 
-    assert finished_scans(conn) == [(scan_id, "2026-W44")]
+    (latest,) = finished_scans(conn)
+    assert (latest.id, latest.week, latest.started_on.isoformat()) == (
+        scan_id,
+        "2026-W44",
+        "2026-10-28",
+    )
     levels = levels_for_scan(conn, scan_id)
     assert {d: s.level for d, s in levels.items()} == {
         "riverbend.example": 3,

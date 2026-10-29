@@ -127,11 +127,11 @@ def diff() -> None:
     if len(scans) < 2:
         typer.echo("Need at least two finished scans to compare.")
         return
-    (new_id, new_week), (old_id, old_week) = scans[0], scans[1]
+    new, old = scans[0], scans[1]
     changes = describe_changes(
-        store.levels_for_scan(conn, old_id), store.levels_for_scan(conn, new_id)
+        store.levels_for_scan(conn, old.id), store.levels_for_scan(conn, new.id)
     )
-    typer.echo(f"Scan {old_id} ({old_week}) to scan {new_id} ({new_week})")
+    typer.echo(f"Scan {old.id} ({old.week}) to scan {new.id} ({new.week})")
     typer.echo("\n".join(changes) if changes else "No changes.")
 
 
@@ -148,15 +148,14 @@ def snapshot() -> None:
     if not scans:
         typer.echo("No finished scan yet. Run spoofcheck scan first.", err=True)
         raise typer.Exit(EXIT_USAGE)
-    scan_id, week = scans[0]
-    started = conn.execute("SELECT started_at FROM scan WHERE id = ?", (scan_id,)).fetchone()[0]
+    latest = scans[0]
     data = snapshots.build_snapshot(
-        store.levels_for_scan(conn, scan_id),
+        store.levels_for_scan(conn, latest.id),
         key,
-        week,
-        datetime.fromisoformat(started).date(),
+        latest.week,
+        latest.started_on,
         __version__,
-        snapshots.previous_snapshot(week),
+        snapshots.previous_snapshot(latest.week),
     )
     path = snapshots.write_snapshot(data)
     typer.echo(f"Wrote {path.relative_to(path.parents[2])}")
@@ -170,16 +169,14 @@ def disclose(organization: str) -> None:
     if not scans:
         typer.echo("No finished scan yet. Run spoofcheck scan first.", err=True)
         raise typer.Exit(EXIT_USAGE)
-    levels = store.levels_for_scan(conn, scans[0][0])
-    matches = [s for s in levels.values() if s.organization.lower() == organization.lower()]
+    latest = scans[0]
+    levels = store.levels_for_scan(conn, latest.id).values()
+    matches = [s for s in levels if s.organization.lower() == organization.lower()]
     if not matches:
         typer.echo(f"No organization named {organization!r} in the last scan.", err=True)
         raise typer.Exit(EXIT_USAGE)
-    started = conn.execute("SELECT started_at FROM scan WHERE id = ?", (scans[0][0],)).fetchone()[0]
     for stored in matches:
-        typer.echo(
-            disclosure_note(stored.organization, stored, datetime.fromisoformat(started).date())
-        )
+        typer.echo(disclosure_note(stored.organization, stored, latest.started_on))
 
 
 @app.command("build-site")

@@ -38,7 +38,9 @@ def normalize_domain(text: str) -> str:
     domain = text.strip().lower().rstrip(".")
     if "@" in domain:
         domain = domain.rsplit("@", 1)[1]
-    domain = domain.encode("idna").decode("ascii") if not domain.isascii() else domain
+    if not domain.isascii():
+        # Names like café.ca are looked up in their ASCII form, xn--caf-dma.ca
+        domain = domain.encode("idna").decode("ascii")
     if not HOSTNAME.match(domain):
         raise ValueError(f"{text!r} is not a domain name")
     return domain
