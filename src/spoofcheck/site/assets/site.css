@@ -336,6 +336,8 @@ details.as-table summary { cursor: pointer; color: var(--link); }
 code { font-family: var(--font-record); font-variation-settings: "wdth" 88; font-size: 0.88em; }
 .coverage { margin: 12px 0 0; max-width: 60ch; color: var(--ink-soft); }
 
+/* the stamp lands from 1.35x scale; don't let it push the page sideways on phones */
+.result { overflow-x: clip; }
 .result-status { margin: 0; padding: 18px 0 8px; max-width: var(--measure); }
 .result-status.is-error { color: var(--lvl-0); font-weight: 600; }
 .enclosure .empty { margin: 0; color: var(--ink-soft); }
