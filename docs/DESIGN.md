@@ -110,7 +110,7 @@ Rules:
 - Write for a resident first and an IT person second. "Forged mail is filed as spam, not refused" before "p=quarantine".
 - Say what happens, not how good or bad it is. No "Great news!", no "Uh oh", no scores out of 100.
 - Errors say what went wrong and what to do: "No DNS answer for riverbend.example. Check the spelling, or try again in a minute."
-- Never write: seamless, robust, comprehensive, powerful, leverage, empower, unlock, elevate, delve, effortless, cutting-edge, game-changer, "in today's digital landscape".
+- No marketing language. If a sentence would fit on any product's landing page, cut it.
 - No emoji anywhere on the site.
 - Each page footer carries the independence disclaimer. The site must not look like gov.bc.ca: no B.C. government logo, crest or BC Sans font.
 
