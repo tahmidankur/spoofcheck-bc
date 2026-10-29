@@ -36,6 +36,14 @@ The hardest part was SPF lookup counting. Receivers stop after 10 DNS lookups, a
 
 That's what the shared test vectors in [tests/vectors/](tests/vectors/) are for. Each case is a small fake DNS zone plus the expected level and findings. `pytest` and `node --test` both load the same files, so a rule can't change in one language without failing in the other. Unit tests never touch the network; DNS and the MTA-STS fetch are faked. CI runs ruff, mypy (strict), pytest and the Node tests on every push.
 
+### Where to start reading
+
+- `src/spoofcheck/dmarc.py`: the level comes from here. `evaluate_dmarc` is the core rule.
+- `src/spoofcheck/spf.py`: `count_spf_lookups` walks includes and counts lookups.
+- `src/spoofcheck/scanner.py`: `check_domain` runs every check for one domain.
+- `tests/vectors/`: the expected answers, one small fake DNS zone per case.
+- `web/check.js`: the same rules for the browser, with names matching the Python.
+
 ## Ethics and limits
 
 It reads public DNS records and, when a domain says it has one, its public MTA-STS policy file. It never connects to a mail server, never sends email and never scans anything. Scans run once a week with at most four lookups in flight.
@@ -53,7 +61,16 @@ uv sync
 uv run spoofcheck check example.ca
 ```
 
-Other commands: `scan`, `diff`, `snapshot` (needs `SNAPSHOT_KEY` in the environment or `.env`), `build-site --out site/`, `disclose "<organization>"` and `inventory check`. Browser checker tests: `node --test web/*.test.js`.
+Other commands: `scan`, `diff`, `snapshot` (needs `SNAPSHOT_KEY` in the environment or `.env`), `build-site --out site/`, `disclose "<organization>"` and `inventory check`.
+
+Tests and checks:
+
+```bash
+uv run pytest                    # Python tests, including the shared vectors
+node --test web/*.test.js        # the same vectors against check.js
+uv run ruff check . && uv run mypy src
+uv run python scripts/check_site.py   # screenshots, axe and phone widths; serve site/ on :8000 first
+```
 
 ## What I'd do next
 
