@@ -203,7 +203,13 @@ function parseMechanism(token) {
 
 export async function checkSpf(domain, resolver) {
   const answer = await resolver.txt(domain);
-  const empty = { seen: answer.records, record: null, allQualifier: null, lookups: 0, voidLookups: 0 };
+  const empty = {
+    seen: answer.records,
+    record: null,
+    allQualifier: null,
+    lookups: 0,
+    voidLookups: 0,
+  };
   if (answer.outcome === "timeout") return { ...empty, findings: [finding("DNS_TIMEOUT")] };
   const found = selectSpfRecords(answer.records);
   if (found.length === 0) return { ...empty, findings: [finding("SPF_MISSING")] };
@@ -211,7 +217,14 @@ export async function checkSpf(domain, resolver) {
   if (found.length > 1) return { ...empty, findings: [finding("SPF_MULTIPLE")] };
 
   const record = parseSpfRecord(found[0]);
-  const tally = { lookups: 0, voidLookups: 0, loop: false, broken: [], usesPtr: false, timedOut: false };
+  const tally = {
+    lookups: 0,
+    voidLookups: 0,
+    loop: false,
+    broken: [],
+    usesPtr: false,
+    timedOut: false,
+  };
   const allQualifier = await countSpfLookups(record, domain, resolver, tally, [domain]);
   return {
     seen: answer.records,
@@ -275,7 +288,8 @@ export function spfFindings(allQualifier, tally) {
   // RFC 7208 §4.6.4: more than 10 lookups is a permerror. A loop would hit the
   // same limit during real evaluation, so it's reported the same way.
   if (tally.lookups > MAX_LOOKUPS || tally.loop) {
-    findings.push(finding("SPF_TOO_MANY_LOOKUPS", tally.loop ? "include loop" : `${tally.lookups} lookups`));
+    const detail = tally.loop ? "include loop" : `${tally.lookups} lookups`;
+    findings.push(finding("SPF_TOO_MANY_LOOKUPS", detail));
   }
   if (tally.voidLookups > MAX_VOID_LOOKUPS) {
     findings.push(finding("SPF_VOID_LOOKUPS", `${tally.voidLookups} void lookups`));
@@ -298,7 +312,9 @@ export function parseMxRecords(records) {
     .map((record) => {
       const [preference, host = ""] = record.trim().split(/\s+/);
       const lower = host.toLowerCase();
-      return { preference: Number(preference), host: lower === "." ? "." : lower.replace(/\.$/, "") };
+      // Keep the lone "." of a null MX; strip the trailing dot from real hosts
+      const name = lower === "." ? "." : lower.replace(/\.$/, "");
+      return { preference: Number(preference), host: name };
     })
     .sort((a, b) => a.preference - b.preference || a.host.localeCompare(b.host));
 }
@@ -314,8 +330,12 @@ export async function checkMx(domain, resolver) {
     return { hosts: [], nullMx: false, receivesMail: false, findings: [finding("DNS_TIMEOUT")] };
   }
   const hosts = parseMxRecords(answer.records);
-  if (!hosts.length) return { hosts, nullMx: false, receivesMail: false, findings: [finding("MX_NONE")] };
-  if (isNullMx(hosts)) return { hosts, nullMx: true, receivesMail: false, findings: [finding("MX_NULL")] };
+  if (!hosts.length) {
+    return { hosts, nullMx: false, receivesMail: false, findings: [finding("MX_NONE")] };
+  }
+  if (isNullMx(hosts)) {
+    return { hosts, nullMx: true, receivesMail: false, findings: [finding("MX_NULL")] };
+  }
   return { hosts, nullMx: false, receivesMail: true, findings: [] };
 }
 
@@ -357,7 +377,8 @@ export async function checkDkim(domain, resolver) {
 export function nonMailFindings(mx, spf, level) {
   // A domain that takes no mail should say it sends none either (CCCS ITSP.40.065).
   if (mx.receivesMail || mx.findings.some((f) => f.code === "DNS_TIMEOUT")) return [];
-  const locked = spf.record !== null && spf.record.toLowerCase().split(/\s+/).join(" ") === "v=spf1 -all";
+  const spfText = (spf.record ?? "").toLowerCase().split(/\s+/).join(" ");
+  const locked = spfText === "v=spf1 -all";
   return locked && level === 3 ? [] : [finding("NON_MAIL_DOMAIN_OPEN")];
 }
 
@@ -394,7 +415,9 @@ export function normalizeTxtData(data) {
   // record split into several strings means one value (RFC 7208 §3.3).
   const trimmed = data.trim();
   if (!trimmed.startsWith('"')) return trimmed;
-  const parts = [...trimmed.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1].replace(/\\(.)/g, "$1"));
+  // Each match is one quoted string; \" inside it is an escaped quote.
+  const quoted = [...trimmed.matchAll(/"((?:[^"\\]|\\.)*)"/g)];
+  const parts = quoted.map((match) => match[1].replace(/\\(.)/g, "$1"));
   return parts.join("");
 }
 
