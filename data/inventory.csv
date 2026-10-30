@@ -1,21 +1,21 @@
 org_name,sector,region,domain,source_url,verified,notes
-City of Kamloops,municipality,Thompson-Nicola,kamloops.ca,,no,seed: confirm against official site
-Thompson-Nicola Regional District,regional_district,Thompson-Nicola,tnrd.ca,,no,seed: confirm against official site
-School District 73 (Kamloops-Thompson),school_district,Thompson-Nicola,sd73.bc.ca,,no,seed: confirm against official site
-Interior Health,health_authority,Interior,interiorhealth.ca,,no,seed: confirm against official site
-City of Kelowna,municipality,Central Okanagan,kelowna.ca,,no,seed: confirm against official site
-Regional District of Central Okanagan,regional_district,Central Okanagan,rdco.com,,no,seed: confirm against official site
-City of Vernon,municipality,North Okanagan,vernon.ca,,no,seed: confirm against official site
-City of Prince George,municipality,Fraser-Fort George,princegeorge.ca,,no,seed: confirm against official site
-City of Vancouver,municipality,Metro Vancouver,vancouver.ca,,no,seed: confirm against official site
-City of Surrey,municipality,Metro Vancouver,surrey.ca,,no,seed: confirm against official site
-City of Burnaby,municipality,Metro Vancouver,burnaby.ca,,no,seed: confirm against official site
-Metro Vancouver Regional District,regional_district,Metro Vancouver,metrovancouver.org,,no,seed: confirm against official site
-City of Victoria,municipality,Capital,victoria.ca,,no,seed: confirm against official site
-Vancouver School Board (SD 39),school_district,Metro Vancouver,vsb.bc.ca,,no,seed: confirm against official site
-Surrey Schools (SD 36),school_district,Metro Vancouver,surreyschools.ca,,no,seed: confirm against official site
-Fraser Health,health_authority,Fraser,fraserhealth.ca,,no,seed: confirm against official site
-Vancouver Coastal Health,health_authority,Vancouver Coastal,vch.ca,,no,seed: confirm against official site
-Island Health,health_authority,Vancouver Island,islandhealth.ca,,no,seed: confirm against official site
-Northern Health,health_authority,Northern,northernhealth.ca,,no,seed: confirm against official site
-Provincial Health Services Authority,health_authority,Province-wide,phsa.ca,,no,seed: confirm against official site
+City of Kamloops,municipality,Thompson-Nicola,kamloops.ca,https://www.kamloops.ca/city-hall/contact-us,yes,official site lists info@kamloops.ca; MX checked 2026-10-30
+Thompson-Nicola Regional District,regional_district,Thompson-Nicola,tnrd.ca,https://www.tnrd.ca/stay-connected/contact-us/,yes,official site lists admin@tnrd.ca; MX checked 2026-10-30
+School District 73 (Kamloops-Thompson),school_district,Thompson-Nicola,sd73.bc.ca,https://www.sd73.bc.ca/meet-the-trustees,yes,official site lists trustee addresses; MX checked 2026-10-30
+Interior Health,health_authority,Interior,interiorhealth.ca,https://www.interiorhealth.ca/about-ih/contact-information,yes,official site lists IHweb@interiorhealth.ca; MX checked 2026-10-30
+City of Kelowna,municipality,Central Okanagan,kelowna.ca,https://www.kelowna.ca/,no,"MX checked 2026-10-30; site blocked automated checks, confirm by hand"
+Regional District of Central Okanagan,regional_district,Central Okanagan,rdco.com,https://www.rdco.com/,yes,official site lists info@rdco.com; MX checked 2026-10-30
+City of Vernon,municipality,North Okanagan,vernon.ca,https://www.vernon.ca/government-services/contact-directory/city-hall,yes,official site lists foirequest@vernon.ca; MX checked 2026-10-30
+City of Prince George,municipality,Fraser-Fort George,princegeorge.ca,https://www.princegeorge.ca/,yes,official site lists 311@princegeorge.ca; MX checked 2026-10-30
+City of Vancouver,municipality,Metro Vancouver,vancouver.ca,https://vancouver.ca/your-government/contact-park-board.aspx,yes,official site lists pbcomments@vancouver.ca; MX checked 2026-10-30
+City of Surrey,municipality,Metro Vancouver,surrey.ca,https://www.surrey.ca/about-surrey/contact-city-of-surrey,yes,official site lists PRCCustomerService@surrey.ca; MX checked 2026-10-30
+City of Burnaby,municipality,Metro Vancouver,burnaby.ca,https://www.burnaby.ca/our-city/contact-us,yes,official site lists customerservice@burnaby.ca; MX checked 2026-10-30
+Metro Vancouver Regional District,regional_district,Metro Vancouver,metrovancouver.org,https://metrovancouver.org/,yes,official site lists icentre@metrovancouver.org; MX checked 2026-10-30
+City of Victoria,municipality,Capital,victoria.ca,https://www.victoria.ca/contact,yes,official site lists accountspayable@victoria.ca; MX checked 2026-10-30
+Vancouver School Board (SD 39),school_district,Metro Vancouver,vsb.bc.ca,https://www.vsb.bc.ca/contact,yes,official site lists projects@vsb.bc.ca; MX checked 2026-10-30
+Surrey Schools (SD 36),school_district,Metro Vancouver,surreyschools.ca,https://www.surreyschools.ca/contact,yes,official site lists feedback@surreyschools.ca; MX checked 2026-10-30
+Fraser Health,health_authority,Fraser,fraserhealth.ca,https://www.fraserhealth.ca/contact,yes,official site lists feedback@fraserhealth.ca; MX checked 2026-10-30
+Vancouver Coastal Health,health_authority,Vancouver Coastal,vch.ca,https://www.vch.ca/en/about-us/media-centre,yes,official site lists media@vch.ca; MX checked 2026-10-30
+Island Health,health_authority,Vancouver Island,islandhealth.ca,https://www.islandhealth.ca/,yes,official site lists info@islandhealth.ca; MX checked 2026-10-30
+Northern Health,health_authority,Northern,northernhealth.ca,https://www.northernhealth.ca/contact,yes,official site lists nhjobs@northernhealth.ca; MX checked 2026-10-30
+Provincial Health Services Authority,health_authority,Province-wide,phsa.ca,https://www.phsa.ca/contact-us,yes,official site lists careers@phsa.ca; MX checked 2026-10-30
